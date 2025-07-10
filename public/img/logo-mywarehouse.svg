@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="60" cy="60" r="58" fill="#fff" stroke="#6777ef" stroke-width="4"/>
+  <!-- Warehouse Building -->
+  <rect x="32" y="54" width="56" height="34" rx="6" fill="#6777ef" stroke="#6777ef" stroke-width="2"/>
+  <rect x="44" y="68" width="12" height="20" rx="2" fill="#fff" stroke="#6777ef" stroke-width="2"/>
+  <rect x="64" y="68" width="12" height="20" rx="2" fill="#fff" stroke="#6777ef" stroke-width="2"/>
+  <!-- Roof -->
+  <polygon points="60,36 28,54 92,54" fill="#fff" stroke="#6777ef" stroke-width="2"/>
+  <!-- Letter M -->
+  <text x="60" y="50" text-anchor="middle" font-size="22" font-family="Nunito, Arial, sans-serif" font-weight="bold" fill="#6777ef">M</text>
+</svg> 

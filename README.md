@@ -1,61 +1,103 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# MyWarehouse - Inventory Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem manajemen inventaris lengkap berbasis Laravel **monolith**: menyediakan antarmuka web modern (Blade + Bootstrap) **dan** REST API profesional (standar JSON, Bearer Token, Swagger).
 
-## About Laravel
+## Mode Aplikasi
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Web Monolith**: Semua fitur manajemen (user, produk, lokasi, mutasi, log) tersedia melalui antarmuka web yang user-friendly, login session-based, notifikasi swal, AJAX, dan validasi modern.
+- **REST API**: Semua fitur utama juga tersedia sebagai REST API (endpoint `/api/v1/...`) dengan autentikasi Bearer Token (Sanctum), response JSON terstandar, dan dokumentasi Swagger/OpenAPI siap diimport ke Postman.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Fitur
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Manajemen User** - CRUD lengkap untuk data user (web & API)
+- **Manajemen Produk** - Katalog produk dengan kategori dan satuan yang terstruktur (web & API)
+- **Manajemen Lokasi** - Pelacakan lokasi gudang dan penyimpanan (web & API)
+- **Mutasi Stok** - Pencatatan keluar/masuk stok dengan validasi (web & API)
+- **Log Aktivitas** - Audit trail yang lengkap (web & API read-only)
+- **REST API** - API lengkap dengan autentikasi Bearer Token
+- **Swagger Documentation** - Dokumentasi API otomatis, siap diimport ke Postman
 
-## Learning Laravel
+## Teknologi yang Digunakan
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Backend**: Laravel 11 (PHP 8.2)
+- **Database**: MySQL 8.0 (struktur normalized)
+- **Authentication**: Laravel Sanctum (Bearer Tokens) & session-based (web)
+- **API Documentation**: OpenAPI/Swagger (L5-Swagger)
+- **Frontend**: Blade Templates + Bootstrap + jQuery
+- **Containerization**: Docker & Docker Compose
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Struktur Database
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Tabel Master & Relasi
+- **product_categories** - Master kategori produk
+- **product_units** - Master satuan produk
+- **products** - Data produk (relasi ke kategori & satuan)
+- **locations** - Data lokasi/gudang
+- **mutations** - Transaksi keluar/masuk stok
+- **app_logs** - Log aktivitas
+- **users** - Data user
 
-## Laravel Sponsors
+### Relasi Utama
+- Produk memiliki relasi ke kategori dan satuan (foreign key)
+- Mutasi menghubungkan produk, lokasi, dan user
+- Relasi produk-lokasi untuk pelacakan stok
+- Audit trail untuk semua operasi
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Panduan Cepat
 
-### Premium Partners
+### Menggunakan Docker (Direkomendasikan)
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+1. **Clone repository**
+   ```bash
+   git clone <repository-url>
+   cd mywarehouse
+   ```
 
-## Contributing
+2. **Build & jalankan container**
+   ```bash
+   docker-compose up -d --build
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. **Jalankan migrasi & seeder**
+   ```bash
+   docker-compose exec app php artisan migrate:fresh --seed
+   ```
 
-## Code of Conduct
+4. **Akses aplikasi**
+   - Web: http://localhost:8000
+   - Dokumentasi API: http://localhost:8000/api/documentation
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Setup Manual
 
-## Security Vulnerabilities
+1. **Install dependency**
+   ```bash
+   composer install
+   npm install
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+2. **Setup environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
 
-## License
+3. **Setup database**
+   ```bash
+   php artisan migrate:fresh --seed
+   ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+4. **Jalankan server development**
+   ```bash
+   php artisan serve
+   ```
+
+## Dokumentasi API
+
+### Autentikasi
+
+Semua endpoint API (kecuali login/register) membutuhkan Bearer Token.
+
+#### Login
+
+```
+ 

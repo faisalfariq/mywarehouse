@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="60" cy="60" r="58" fill="#fff" stroke="#6777ef" stroke-width="4"/>
+  <!-- Mobil -->
+  <rect x="30" y="60" width="60" height="22" rx="8" fill="#6777ef" stroke="#6777ef" stroke-width="2"/>
+  <rect x="38" y="50" width="44" height="18" rx="6" fill="#fff" stroke="#6777ef" stroke-width="2"/>
+  <circle cx="40" cy="86" r="6" fill="#fff" stroke="#6777ef" stroke-width="3"/>
+  <circle cx="80" cy="86" r="6" fill="#fff" stroke="#6777ef" stroke-width="3"/>
+  <!-- Pin GPS -->
+  <g>
+    <circle cx="60" cy="38" r="10" fill="#6777ef" stroke="#6777ef" stroke-width="2"/>
+    <circle cx="60" cy="38" r="4" fill="#fff"/>
+    <path d="M60 48 Q60 52 56 56 Q60 54 64 56 Q60 52 60 48 Z" fill="#6777ef"/>
+  </g>
+</svg> 

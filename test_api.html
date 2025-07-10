@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+</head>
+<body>
+    <h1>MyWarehouse API Test</h1>
+    
+    <h2>Login Test</h2>
+    <button onclick="testLogin()">Test Login</button>
+    <div id="loginResult"></div>
+    
+    <h2>Products Test</h2>
+    <button onclick="testProducts()">Test Products</button>
+    <div id="productsResult"></div>
+    
+    <script>
+        let token = '';
+        
+        async function testLogin() {
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'admin@mywarehouse.com',
+                        password: 'password'
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('loginResult').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                
+                if (data.success && data.data.token) {
+                    token = data.data.token;
+                    console.log('Token:', token);
+                }
+            } catch (error) {
+                document.getElementById('loginResult').innerHTML = '<p style="color: red;">Error: ' + error.message + '</p>';
+            }
+        }
+        
+        async function testProducts() {
+            if (!token) {
+                document.getElementById('productsResult').innerHTML = '<p style="color: red;">Please login first!</p>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/v1/products', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('productsResult').innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('productsResult').innerHTML = '<p style="color: red;">Error: ' + error.message + '</p>';
+            }
+        }
+    </script>
+</body>
+</html> 
