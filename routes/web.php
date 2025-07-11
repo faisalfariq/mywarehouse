@@ -13,6 +13,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// API Documentation Route
+Route::get('/api/documentation', function () {
+    return view('l5-swagger::index');
+})->name('api.documentation');
+
 // Simple Auth Routes
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);

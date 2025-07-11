@@ -119,12 +119,11 @@ class ProductApiController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name","code","category_id","unit_id","price"},
-     *             @OA\Property(property="name", type="string", example="Laptop ASUS"),
-     *             @OA\Property(property="code", type="string", example="LAP001"),
+     *             required={"product_name","product_code","category_id","unit_id"},
+     *             @OA\Property(property="product_name", type="string", example="Laptop ASUS"),
+     *             @OA\Property(property="product_code", type="string", example="LAP001"),
      *             @OA\Property(property="category_id", type="integer", example=1),
      *             @OA\Property(property="unit_id", type="integer", example=1),
-     *             @OA\Property(property="price", type="number", example=15000000),
      *             @OA\Property(property="description", type="string", example="High performance laptop")
      *         )
      *     ),

@@ -21,6 +21,28 @@ use OpenApi\Annotations as OA;
 class MutationApiController extends Controller 
 {
     /**
+     * Calculate current stock for a product at a specific location
+     * 
+     * @param int $productId
+     * @param int $locationId
+     * @param int|null $excludeMutationId
+     * @return int
+     */
+    private function calculateCurrentStock(int $productId, int $locationId, ?int $excludeMutationId = null): int
+    {
+        $query = Mutation::where('product_id', $productId)
+            ->where('location_id', $locationId);
+        
+        if ($excludeMutationId) {
+            $query->where('id', '!=', $excludeMutationId);
+        }
+        
+        return $query->get()->sum(function($mutation) {
+            return $mutation->mutation_type === 'in' ? $mutation->quantity : -$mutation->quantity;
+        });
+    }
+
+    /**
      * @OA\Get(
      *     path="/api/v1/mutations",
      *     summary="Get all mutations",
@@ -34,7 +56,7 @@ class MutationApiController extends Controller
      *         @OA\Schema(type="string")
      *     ),
      *     @OA\Parameter(
-     *         name="type",
+     *         name="mutation_type",
      *         in="query",
      *         description="Filter by mutation type (in/out)",
      *         required=false,
@@ -89,13 +111,13 @@ class MutationApiController extends Controller
             
             if ($request->has('search') && $request->search) {
                 $query->whereHas('product', function($q) use ($request) {
-                    $q->where('name', 'like', '%' . $request->search . '%')
-                      ->orWhere('code', 'like', '%' . $request->search . '%');
+                    $q->where('product_name', 'like', '%' . $request->search . '%')
+                      ->orWhere('product_code', 'like', '%' . $request->search . '%');
                 });
             }
             
-            if ($request->has('type') && $request->type) {
-                $query->where('type', $request->type);
+            if ($request->has('mutation_type') && $request->mutation_type) {
+                $query->where('mutation_type', $request->mutation_type);
             }
             
             if ($request->has('product_id') && $request->product_id) {
@@ -141,12 +163,12 @@ class MutationApiController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"product_id","location_id","type","quantity","description"},
+     *             required={"product_id","location_id","mutation_type","quantity","note"},
      *             @OA\Property(property="product_id", type="integer", example=1),
      *             @OA\Property(property="location_id", type="integer", example=1),
-     *             @OA\Property(property="type", type="string", enum={"in", "out"}, example="in"),
+     *             @OA\Property(property="mutation_type", type="string", enum={"in", "out"}, example="in"),
      *             @OA\Property(property="quantity", type="integer", example=10),
-     *             @OA\Property(property="description", type="string", example="Stock in from supplier")
+     *             @OA\Property(property="note", type="string", example="Stock in from supplier")
      *         )
      *     ),
      *     @OA\Response(
@@ -170,9 +192,9 @@ class MutationApiController extends Controller
             $validator = Validator::make($request->all(), [
                 'product_id' => 'required|exists:products,id',
                 'location_id' => 'required|exists:locations,id',
-                'type' => 'required|in:in,out',
+                'mutation_type' => 'required|in:in,out',
                 'quantity' => 'required|integer|min:1',
-                'description' => 'required|string|max:500',
+                'note' => 'required|string|max:500',
             ]);
 
             if ($validator->fails()) {
@@ -184,17 +206,12 @@ class MutationApiController extends Controller
             }
 
             // Check stock availability for out mutation
-            if ($request->type === 'out') {
+            if ($request->mutation_type === 'out') {
                 $product = Product::find($request->product_id);
                 $location = Location::find($request->location_id);
                 
                 // Get current stock at this location
-                $currentStock = Mutation::where('product_id', $request->product_id)
-                    ->where('location_id', $request->location_id)
-                    ->get()
-                    ->sum(function($mutation) {
-                        return $mutation->type === 'in' ? $mutation->quantity : -$mutation->quantity;
-                    });
+                $currentStock = $this->calculateCurrentStock($request->product_id, $request->location_id);
                 
                 if ($currentStock < $request->quantity) {
                     return response()->json([
@@ -209,9 +226,9 @@ class MutationApiController extends Controller
                 'product_id' => $request->product_id,
                 'location_id' => $request->location_id,
                 'user_id' => auth()->id(),
-                'type' => $request->type,
+                'mutation_type' => $request->mutation_type,
                 'quantity' => $request->quantity,
-                'description' => $request->description,
+                'note' => $request->note,
             ]);
 
             $mutation->load(['product', 'location', 'user']);
@@ -318,7 +335,7 @@ class MutationApiController extends Controller
      *         required=true,
      *         @OA\JsonContent(
      *             @OA\Property(property="quantity", type="integer", example=15),
-     *             @OA\Property(property="description", type="string", example="Updated description")
+     *             @OA\Property(property="note", type="string", example="Updated description")
      *         )
      *     ),
      *     @OA\Response(
@@ -355,7 +372,7 @@ class MutationApiController extends Controller
 
             $validator = Validator::make($request->all(), [
                 'quantity' => 'sometimes|required|integer|min:1',
-                'description' => 'sometimes|required|string|max:500',
+                'note' => 'sometimes|required|string|max:500',
             ]);
 
             if ($validator->fails()) {
@@ -366,7 +383,33 @@ class MutationApiController extends Controller
                 ], 422);
             }
 
-            $mutation->update($request->only(['quantity', 'description']));
+            // Check stock availability for out mutation when quantity is being updated
+            if ($mutation->mutation_type === 'out' && $request->has('quantity')) {
+                $newQuantity = $request->quantity;
+                $oldQuantity = $mutation->quantity;
+                $quantityDifference = $newQuantity - $oldQuantity;
+                
+                if ($quantityDifference > 0) {
+                    // Calculate current stock excluding this mutation
+                    $currentStock = $this->calculateCurrentStock($mutation->product_id, $mutation->location_id, $mutation->id);
+                    
+                    // Add back the old quantity to get available stock
+                    $availableStock = $currentStock + $oldQuantity;
+                    
+                    if ($availableStock < $newQuantity) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Insufficient stock. Available: ' . $availableStock,
+                            'errors' => null
+                        ], 422);
+                    }
+                }
+            }
+
+            $mutation->update([
+                'quantity' => $request->quantity,
+                'note' => $request->note
+            ]);
             $mutation->load(['product', 'location', 'user']);
 
             // Log activity
@@ -431,7 +474,22 @@ class MutationApiController extends Controller
                 ], 404);
             }
 
-            $mutationData = $mutation->type . ' ' . $mutation->quantity . ' ' . $mutation->product->name;
+            // Check stock availability before deleting out mutation
+            if ($mutation->mutation_type === 'out') {
+                // Calculate current stock excluding this mutation
+                $currentStock = $this->calculateCurrentStock($mutation->product_id, $mutation->location_id, $mutation->id);
+                
+                // If deleting this mutation would cause negative stock, prevent deletion
+                if ($currentStock < $mutation->quantity) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Cannot delete mutation. Deleting this mutation would cause insufficient stock. Available: ' . $currentStock,
+                        'errors' => null
+                    ], 422);
+                }
+            }
+
+            $mutationData = $mutation->mutation_type . ' ' . $mutation->quantity . ' ' . $mutation->product->name;
             $mutation->delete();
 
             // Log activity

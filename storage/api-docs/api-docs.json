@@ -506,11 +506,15 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "address"
+                                    "location_code",
+                                    "location_name"
                                 ],
                                 "properties": {
-                                    "name": {
+                                    "location_code": {
+                                        "type": "string",
+                                        "example": "WH001"
+                                    },
+                                    "location_name": {
                                         "type": "string",
                                         "example": "Warehouse A"
                                     },
@@ -636,7 +640,11 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "name": {
+                                    "location_code": {
+                                        "type": "string",
+                                        "example": "WH001"
+                                    },
+                                    "location_name": {
                                         "type": "string",
                                         "example": "Warehouse A Updated"
                                     },
@@ -760,7 +768,7 @@
                         }
                     },
                     {
-                        "name": "type",
+                        "name": "mutation_type",
                         "in": "query",
                         "description": "Filter by mutation type (in/out)",
                         "required": false,
@@ -865,9 +873,9 @@
                                 "required": [
                                     "product_id",
                                     "location_id",
-                                    "type",
+                                    "mutation_type",
                                     "quantity",
-                                    "description"
+                                    "note"
                                 ],
                                 "properties": {
                                     "product_id": {
@@ -878,7 +886,7 @@
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "type": {
+                                    "mutation_type": {
                                         "type": "string",
                                         "enum": [
                                             "in",
@@ -890,7 +898,7 @@
                                         "type": "integer",
                                         "example": 10
                                     },
-                                    "description": {
+                                    "note": {
                                         "type": "string",
                                         "example": "Stock in from supplier"
                                     }
@@ -1012,7 +1020,7 @@
                                         "type": "integer",
                                         "example": 15
                                     },
-                                    "description": {
+                                    "note": {
                                         "type": "string",
                                         "example": "Updated description"
                                     }
@@ -1206,18 +1214,17 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "name",
-                                    "code",
+                                    "product_name",
+                                    "product_code",
                                     "category_id",
-                                    "unit_id",
-                                    "price"
+                                    "unit_id"
                                 ],
                                 "properties": {
-                                    "name": {
+                                    "product_name": {
                                         "type": "string",
                                         "example": "Laptop ASUS"
                                     },
-                                    "code": {
+                                    "product_code": {
                                         "type": "string",
                                         "example": "LAP001"
                                     },
@@ -1228,10 +1235,6 @@
                                     "unit_id": {
                                         "type": "integer",
                                         "example": 1
-                                    },
-                                    "price": {
-                                        "type": "number",
-                                        "example": 15000000
                                     },
                                     "description": {
                                         "type": "string",

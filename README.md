@@ -28,14 +28,15 @@ Sistem manajemen inventaris lengkap berbasis Laravel **monolith**: menyediakan a
 
 ## Struktur Database
 
-### Tabel Master & Relasi
+### Tabel Master, Relasi & Pivot
 - **product_categories** - Master kategori produk
 - **product_units** - Master satuan produk
 - **products** - Data produk (relasi ke kategori & satuan)
 - **locations** - Data lokasi/gudang
-- **mutations** - Transaksi keluar/masuk stok
-- **app_logs** - Log aktivitas
 - **users** - Data user
+- **mutations** - Transaksi keluar/masuk stok (relasi ke produk, lokasi, user)
+- **product_locations** - Pivot stok produk per lokasi (tracking stok per produk & lokasi, update otomatis saat mutasi)
+- **app_logs** - Log aktivitas (audit trail semua aksi penting)
 
 ### Relasi Utama
 - Produk memiliki relasi ke kategori dan satuan (foreign key)
@@ -64,8 +65,16 @@ Sistem manajemen inventaris lengkap berbasis Laravel **monolith**: menyediakan a
    ```
 
 4. **Akses aplikasi**
-   - Web: http://localhost:8000
-   - Dokumentasi API: http://localhost:8000/api/documentation
+   - Web: http://localhost:8000 
+
+   - Dokumentasi API POSTMAN : 
+   https://www.postman.com/medeva-test/id-grow-test-by-faisal/collection/na98ivp/mywarehouse-api?action=share&creator=16687625 
+
+   atau
+
+   https://documenter.getpostman.com/view/16687625/2sB34fmLXT
+
+   - Dokumentasi API di situs : http://localhost:8000/api/documentation
 
 ### Setup Manual
 

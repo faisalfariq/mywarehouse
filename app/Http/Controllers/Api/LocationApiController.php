@@ -66,7 +66,8 @@ class LocationApiController extends Controller
             
             if ($request->has('search') && $request->search) {
                 $query->where(function($q) use ($request) {
-                    $q->where('name', 'like', '%' . $request->search . '%')
+                    $q->where('location_name', 'like', '%' . $request->search . '%')
+                      ->orWhere('location_code', 'like', '%' . $request->search . '%')
                       ->orWhere('address', 'like', '%' . $request->search . '%');
                 });
             }
@@ -106,8 +107,9 @@ class LocationApiController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"name","address"},
-     *             @OA\Property(property="name", type="string", example="Warehouse A"),
+     *             required={"location_code","location_name"},
+     *             @OA\Property(property="location_code", type="string", example="WH001"),
+     *             @OA\Property(property="location_name", type="string", example="Warehouse A"),
      *             @OA\Property(property="address", type="string", example="Jl. Sudirman No. 123, Jakarta"),
      *             @OA\Property(property="description", type="string", example="Main warehouse for electronics")
      *         )
@@ -240,7 +242,8 @@ class LocationApiController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             @OA\Property(property="name", type="string", example="Warehouse A Updated"),
+     *             @OA\Property(property="location_code", type="string", example="WH001"),
+     *             @OA\Property(property="location_name", type="string", example="Warehouse A Updated"),
      *             @OA\Property(property="address", type="string", example="Jl. Sudirman No. 456, Jakarta"),
      *             @OA\Property(property="description", type="string", example="Updated description")
      *         )
